@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BJJ Tournament Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-icon">🥋</span>
+                <div>
+                    <h1 class="logo-title">BJJ Manager</h1>
+                    <span class="logo-sub">Tournament System</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-item" data-section="teams" onclick="showSection('teams')">
+                <span class="nav-icon">🏆</span>
+                <span>Equipes</span>
+            </button>
+            <button class="nav-item" data-section="athletes" onclick="showSection('athletes')">
+                <span class="nav-icon">👤</span>
+                <span>Atletas</span>
+            </button>
+            <button class="nav-item" data-section="categories" onclick="showSection('categories')">
+                <span class="nav-icon">🎯</span>
+                <span>Categorias</span>
+            </button>
+            <button class="nav-item" data-section="matches" onclick="showSection('matches')">
+                <span class="nav-icon">⚔️</span>
+                <span>Lutas</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="api-status" id="apiStatus">
+                <span class="status-dot"></span>
+                <span id="apiStatusText">Conectando...</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2 class="page-title" id="pageTitle">Dashboard</h2>
+            </div>
+            <div class="topbar-right">
+                <span class="api-badge">API: localhost:8080</span>
+            </div>
+        </header>
+
+        <!-- TOAST NOTIFICATION -->
+        <div class="toast" id="toast"></div>
+
+        <!-- =================== DASHBOARD =================== -->
+        <section class="section active" id="section-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card" onclick="showSection('teams')">
+                    <div class="stat-icon teams-color">🏆</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="stat-teams">--</span>
+                        <span class="stat-label">Equipes</span>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="showSection('athletes')">
+                    <div class="stat-icon athletes-color">👤</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="stat-athletes">--</span>
+                        <span class="stat-label">Atletas</span>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="showSection('categories')">
+                    <div class="stat-icon categories-color">🎯</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="stat-categories">--</span>
+                        <span class="stat-label">Categorias</span>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="showSection('matches')">
+                    <div class="stat-icon matches-color">⚔️</div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="stat-matches">--</span>
+                        <span class="stat-label">Lutas</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Lutas Recentes</h3>
+                    </div>
+                    <div class="card-body" id="dashboard-matches">
+                        <div class="loading-state">Carregando...</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Atletas em Luta</h3>
+                    </div>
+                    <div class="card-body" id="dashboard-fighting">
+                        <div class="loading-state">Carregando...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== TEAMS =================== -->
+        <section class="section" id="section-teams">
+            <div class="section-actions">
+                <button class="btn btn-primary" onclick="openModal('modal-team')">
+                    <span>+</span> Nova Equipe
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Equipes Cadastradas</h3>
+                    <span class="badge" id="teams-count">0</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome da Equipe</th>
+                                    <th>Atletas</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teams-tbody">
+                                <tr><td colspan="4" class="empty-state">Carregando equipes...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== ATHLETES =================== -->
+        <section class="section" id="section-athletes">
+            <div class="section-actions">
+                <button class="btn btn-primary" onclick="openAthleteModal()">
+                    <span>+</span> Novo Atleta
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Atletas Cadastrados</h3>
+                    <span class="badge" id="athletes-count">0</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Equipe</th>
+                                    <th>Categoria</th>
+                                    <th>Faixa</th>
+                                    <th>Peso</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="athletes-tbody">
+                                <tr><td colspan="8" class="empty-state">Carregando atletas...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== CATEGORIES =================== -->
+        <section class="section" id="section-categories">
+            <div class="section-actions">
+                <button class="btn btn-primary" onclick="openModal('modal-category')">
+                    <span>+</span> Nova Categoria
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Categorias Cadastradas</h3>
+                    <span class="badge" id="categories-count">0</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Faixa</th>
+                                    <th>Gênero</th>
+                                    <th>Peso Máx.</th>
+                                    <th>Idade Máx.</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categories-tbody">
+                                <tr><td colspan="7" class="empty-state">Carregando categorias...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== MATCHES =================== -->
+        <section class="section" id="section-matches">
+            <div class="section-actions">
+                <button class="btn btn-primary" onclick="openMatchModal()">
+                    <span>+</span> Nova Luta
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Lutas Registradas</h3>
+                    <span class="badge" id="matches-count">0</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Atleta 1</th>
+                                    <th>Atleta 2</th>
+                                    <th>Categoria</th>
+                                    <th>Vencedor</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matches-tbody">
+                                <tr><td colspan="7" class="empty-state">Carregando lutas...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =================== MODALS =================== -->
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeAllModals()"></div>
+
+    <!-- Modal: Team -->
+    <div class="modal" id="modal-team">
+        <div class="modal-header">
+            <h3 id="modal-team-title">Nova Equipe</h3>
+            <button class="modal-close" onclick="closeAllModals()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="team-id">
+            <div class="form-group">
+                <label>Nome da Equipe</label>
+                <input type="text" id="team-name" placeholder="Ex: Gracie Barra, Alliance...">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeAllModals()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveTeam()">Salvar</button>
+        </div>
+    </div>
+
+    <!-- Modal: Category -->
+    <div class="modal" id="modal-category">
+        <div class="modal-header">
+            <h3 id="modal-category-title">Nova Categoria</h3>
+            <button class="modal-close" onclick="closeAllModals()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="category-id">
+            <div class="form-group">
+                <label>Nome da Categoria</label>
+                <input type="text" id="category-name" placeholder="Ex: Adulto Meio-Pesado">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Faixa</label>
+                    <select id="category-belt">
+                        <option value="">Selecione...</option>
+                        <option>Branca</option>
+                        <option>Azul</option>
+                        <option>Roxa</option>
+                        <option>Marrom</option>
+                        <option>Preta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Gênero</label>
+                    <select id="category-gender">
+                        <option value="">Selecione...</option>
+                        <option>Masculino</option>
+                        <option>Feminino</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Peso Máximo (kg)</label>
+                    <input type="number" id="category-weight" step="0.1" placeholder="Ex: 88.3">
+                </div>
+                <div class="form-group">
+                    <label>Idade Máxima</label>
+                    <input type="number" id="category-age" placeholder="Ex: 30">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeAllModals()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveCategory()">Salvar</button>
+        </div>
+    </div>
+
+    <!-- Modal: Athlete -->
+    <div class="modal modal-wide" id="modal-athlete">
+        <div class="modal-header">
+            <h3 id="modal-athlete-title">Novo Atleta</h3>
+            <button class="modal-close" onclick="closeAllModals()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="athlete-id">
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" id="athlete-name" placeholder="Ex: João Silva">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Equipe</label>
+                    <select id="athlete-team">
+                        <option value="">Selecione uma equipe...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <select id="athlete-category">
+                        <option value="">Selecione uma categoria...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Faixa</label>
+                    <select id="athlete-belt">
+                        <option value="">Selecione...</option>
+                        <option>Branca</option>
+                        <option>Azul</option>
+                        <option>Roxa</option>
+                        <option>Marrom</option>
+                        <option>Preta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Gênero</label>
+                    <select id="athlete-gender">
+                        <option value="">Selecione...</option>
+                        <option>Masculino</option>
+                        <option>Feminino</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" id="athlete-weight" step="0.1" placeholder="Ex: 82.5">
+                </div>
+                <div class="form-group">
+                    <label>Idade</label>
+                    <input type="number" id="athlete-age" placeholder="Ex: 25">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Está em Luta?</label>
+                <select id="athlete-fighting">
+                    <option value="Não">Não</option>
+                    <option value="Sim">Sim</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeAllModals()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveAthlete()">Salvar</button>
+        </div>
+    </div>
+
+    <!-- Modal: Match -->
+    <div class="modal modal-wide" id="modal-match">
+        <div class="modal-header">
+            <h3 id="modal-match-title">Nova Luta</h3>
+            <button class="modal-close" onclick="closeAllModals()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="match-id">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Atleta 1</label>
+                    <select id="match-athlete1">
+                        <option value="">Selecione...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Atleta 2</label>
+                    <select id="match-athlete2">
+                        <option value="">Selecione...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <select id="match-category">
+                        <option value="">Selecione...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="match-status">
+                        <option value="Agendada">Agendada</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Finalizada">Finalizada</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Vencedor (opcional)</label>
+                <select id="match-winner">
+                    <option value="">Sem vencedor definido</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeAllModals()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveMatch()">Salvar</button>
+        </div>
+    </div>
+
+    <!-- Modal: Confirm Delete -->
+    <div class="modal modal-sm" id="modal-confirm">
+        <div class="modal-header">
+            <h3>Confirmar Exclusão</h3>
+            <button class="modal-close" onclick="closeAllModals()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p class="confirm-text">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeAllModals()">Cancelar</button>
+            <button class="btn btn-danger" id="confirm-delete-btn">Excluir</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
