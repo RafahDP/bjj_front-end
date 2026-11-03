@@ -2,7 +2,7 @@
 // BJJ TOURNAMENT MANAGER - JS
 // ===========================
 
-const API = 'http://localhost:8080';
+const API = 'http://localhost:8090';
 
 // In-memory caches
 let teams = [];
