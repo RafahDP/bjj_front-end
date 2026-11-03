@@ -258,7 +258,7 @@ async function saveAthlete() {
     const gender = document.getElementById('athlete-gender').value;
     const weight = document.getElementById('athlete-weight').value;
     const age = document.getElementById('athlete-age').value;
-    const isFighting = document.getElementById('athlete-fighting').value;
+    const isFighting = document.getElementById('athlete-fighting').value=== true;
 
     if (!name) { showToast('Informe o nome do atleta!', 'error'); return; }
 
@@ -580,7 +580,7 @@ function renderDashboard() {
 
     // Athletes currently fighting
     const fightingDiv = document.getElementById('dashboard-fighting');
-    const fighting = athletes.filter(a => a.isFighting === 'Sim');
+    const fighting = athletes.filter(a => a.isFighting === true);
     if (!fighting.length) {
         fightingDiv.innerHTML = `<div class="loading-state">Nenhum atleta em luta.</div>`;
     } else {
