@@ -203,7 +203,7 @@ function renderAthletes() {
             <td><span style="color:var(--text-muted)">#${a.id}</span></td>
             <td style="color:var(--text-primary);font-weight:500">${a.name}</td>
             <td>${a.team ? a.team.teamName : '<span style="color:var(--text-muted)">—</span>'}</td>
-            <td>${a.category ? a.category.category_name : '<span style="color:var(--text-muted)">—</span>'}</td>
+            <td>${a.category ? a.category.categoryName : '<span style="color:var(--text-muted)">—</span>'}</td>
             <td><span class="belt-badge belt-${a.belt}">${a.belt || '—'}</span></td>
             <td>${a.weight ? a.weight + ' kg' : '—'}</td>
             <td><span class="status-badge status-${a.isFighting}">${a.isFighting || '—'}</span></td>
@@ -258,7 +258,7 @@ async function saveAthlete() {
     const gender = document.getElementById('athlete-gender').value;
     const weight = document.getElementById('athlete-weight').value;
     const age = document.getElementById('athlete-age').value;
-    const isFighting = document.getElementById('athlete-fighting').value=== true;
+    const isFighting = document.getElementById('athlete-fighting').value=== 'true';
 
     if (!name) { showToast('Informe o nome do atleta!', 'error'); return; }
 
@@ -316,11 +316,11 @@ function renderCategories() {
     tbody.innerHTML = categories.map(c => `
         <tr>
             <td><span style="color:var(--text-muted)">#${c.id}</span></td>
-            <td style="color:var(--text-primary);font-weight:500">${c.category_name}</td>
+            <td style="color:var(--text-primary);font-weight:500">${c.categoryName}</td>
             <td><span class="belt-badge belt-${c.belt}">${c.belt || '—'}</span></td>
             <td>${c.gender || '—'}</td>
-            <td>${c.max_weight ? c.max_weight + ' kg' : '—'}</td>
-            <td>${c.max_age || '—'} anos</td>
+            <td>${c.maxWeight ? c.maxWeight + ' kg' : '—'}</td>
+            <td>${c.maxAge || '—'} anos</td>
             <td>
                 <div class="actions-cell">
                     <button class="btn-icon edit" onclick="editCategory(${c.id})" title="Editar">✏️</button>
@@ -335,11 +335,11 @@ async function editCategory(id) {
     const c = categories.find(x => x.id === id);
     if (!c) return;
     document.getElementById('category-id').value = c.id;
-    document.getElementById('category-name').value = c.category_name || '';
+    document.getElementById('category-name').value = c.categoryName || '';
     document.getElementById('category-belt').value = c.belt || '';
     document.getElementById('category-gender').value = c.gender || '';
-    document.getElementById('category-weight').value = c.max_weight || '';
-    document.getElementById('category-age').value = c.max_age || '';
+    document.getElementById('category-weight').value = c.maxWeight || '';
+    document.getElementById('category-age').value = c.maxAge || '';
     document.getElementById('modal-category-title').textContent = 'Editar Categoria';
     openModal('modal-category');
 }
@@ -366,11 +366,11 @@ async function saveCategory() {
     if (!name) { showToast('Informe o nome da categoria!', 'error'); return; }
 
     const body = {
-        category_name: name,
+        categoryName: name,
         belt,
         gender,
-        max_weight: weight ? parseFloat(weight) : 0,
-        max_age: age ? parseInt(age) : 0
+        maxWeight: weight ? parseFloat(weight) : 0,
+        maxAge: age ? parseInt(age) : 0
     };
 
     const url = id ? `${API}/categories/${id}` : `${API}/categories`;
@@ -420,7 +420,7 @@ function renderMatches() {
             <td><span style="color:var(--text-muted)">#${m.id}</span></td>
             <td style="color:var(--text-primary);font-weight:500">${m.athlete1 ? m.athlete1.name : '—'}</td>
             <td style="color:var(--text-primary);font-weight:500">${m.athlete2 ? m.athlete2.name : '—'}</td>
-            <td>${m.category ? m.category.category_name : '—'}</td>
+            <td>${m.category ? m.category.categoryName : '—'}</td>
             <td>${m.winner ? `<span style="color:var(--gold)">🏅 ${m.winner.name}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
             <td><span class="status-badge status-${statusKey}">${m.matchStatus || '—'}</span></td>
             <td>
@@ -463,7 +463,7 @@ async function editMatch(id) {
 
 function populateMatchSelects() {
     const athleteOpts = athletes.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-    const catOpts = categories.map(c => `<option value="${c.id}">${c.category_name}</option>`).join('');
+    const catOpts = categories.map(c => `<option value="${c.id}">${c.categoryName}</option>`).join('');
 
     document.getElementById('match-athlete1').innerHTML = `<option value="">Selecione...</option>${athleteOpts}`;
     document.getElementById('match-athlete2').innerHTML = `<option value="">Selecione...</option>${athleteOpts}`;
@@ -547,7 +547,7 @@ async function refreshSelectData() {
 
     // Populate athlete form selects
     const teamOpts = teams.map(t => `<option value="${t.id}">${t.teamName}</option>`).join('');
-    const catOpts = categories.map(c => `<option value="${c.id}">${c.category_name}</option>`).join('');
+    const catOpts = categories.map(c => `<option value="${c.id}">${c.categoryName}</option>`).join('');
 
     const teamSel = document.getElementById('athlete-team');
     const catSel = document.getElementById('athlete-category');
